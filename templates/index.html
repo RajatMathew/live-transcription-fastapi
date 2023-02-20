@@ -4,8 +4,20 @@
         <title>Live Transcription</title>
     </head>
     <body>
-        <h1>Transcribe Audio With FastAPI</h1>
-        <p id="status">Connection status will go here</p>
+
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+        </style>
+        
+        <div style="display: flex;">
+        <svg width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+          </svg>
+          
+        <p id="status">&nbsp;&nbsp;Connection status will go here</p>
+    </div>
         <p id="transcript"></p>
 
         <script>
@@ -20,7 +32,7 @@
             const socket = new WebSocket('ws://localhost:8000/listen')
 
             socket.onopen = () => {
-                document.querySelector('#status').textContent = 'Connected'
+                document.querySelector('#status').textContent = ' Connected'
                 console.log({ event: 'onopen' })
                 mediaRecorder.addEventListener('dataavailable', async (event) => {
                     if (event.data.size > 0 && socket.readyState == 1) {

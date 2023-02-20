@@ -10,7 +10,7 @@ load_dotenv()
 
 app = FastAPI()
 
-dg_client = Deepgram(os.getenv('DEEPGRAM_API_KEY'))
+dg_client = Deepgram('193573d3f68035a58a8cea9fe8b2cbf921fe2712')
 
 templates = Jinja2Templates(directory="templates")
 
