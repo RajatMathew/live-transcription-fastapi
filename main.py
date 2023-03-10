@@ -5,10 +5,14 @@ from typing import Dict, Callable
 from deepgram import Deepgram
 from dotenv import load_dotenv
 import os
+import random
 
 load_dotenv()
 
 app = FastAPI()
+
+
+
 
 dg_client = Deepgram('193573d3f68035a58a8cea9fe8b2cbf921fe2712')
 
@@ -21,6 +25,7 @@ async def process_audio(fast_socket: WebSocket):
         
             if transcript:
                 await fast_socket.send_text(transcript)
+                print(transcript)
 
     deepgram_socket = await connect_to_deepgram(get_transcript)
 

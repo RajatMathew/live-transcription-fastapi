@@ -1,64 +1,157 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Live Transcription</title>
-    </head>
-    <body>
+  <head>
+    <title>Live Transcription</title>
 
-        <style>
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            }
-        </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f6f6f6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        font-family: "IBM Plex Mono";
+      }
+    </style>
+
+    <div
+      style="margin-bottom: 20px; margin-top: 10px;padding: 10px 15px; border-radius: 20px;color: rgb(15, 132, 15); background-color: transparent; border: 0.1px solid green;"
+    >
+      <div style="display: flex">
+        <svg
+          width="12"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"
+          />
+        </svg>
+
+        <p id="status" style="text-transform: uppercase;margin: 0; font-size: 12px">&nbsp;&nbsp;Connection awaiting...</p>
         
-        <div style="display: flex;">
-        <svg width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-          </svg>
-          
-        <p id="status">&nbsp;&nbsp;Connection status will go here</p>
+      </div>
+      
     </div>
-        <p id="transcript"></p>
 
-        <script>
-               navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-            if (!MediaRecorder.isTypeSupported('audio/webm'))
-                return alert('Browser not supported')
+    
+    <div
+      style="
+        height: 400px;
+        background-color: white;
+        border-radius: 10px;
+        width: 500px;
+        padding: 20px;
+        box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+      "
+    >
+    <div class="round-box">
+      <div class="round"></div>
+      <div class="round"></div>
+      <div class="round"></div>
+    </div>
+      <p contenteditable="true" id="transcript" style="font-size: large; color: #8d8d8d">
+      Speak now</p>
+    </div>
+  
 
-            const mediaRecorder = new MediaRecorder(stream, {
-                mimeType: 'audio/webm',
-            })
 
-            const socket = new WebSocket('ws://localhost:8000/listen')
-
-            socket.onopen = () => {
-                document.querySelector('#status').textContent = ' Connected'
-                console.log({ event: 'onopen' })
-                mediaRecorder.addEventListener('dataavailable', async (event) => {
-                    if (event.data.size > 0 && socket.readyState == 1) {
-                        socket.send(event.data)
-                    }
-            })
-            mediaRecorder.start(250)
-            }
-
-            socket.onmessage = (message) => {
-                const received = message.data
-                if (received) {
-                    console.log(received)
-                    document.querySelector('#transcript').textContent += ' ' + received
-                }
-           }
-
-           socket.onclose = () => {
-            console.log({ event: 'onclose' })
+    <style>
+      .round-box {
+        display: flex;
+        gap: 5px;
+      }
+      .round {
+        padding: 3px;
+        border-radius: 50%;
+        background-color: green;
+      }
+      .round:nth-child(1) {
+        animation: anim1 0.5s ease-in-out infinite;
+      }
+      .round:nth-child(2) {
+        animation: anim1 0.6s ease-in-out infinite;
+      }
+      .round:nth-child(3) {
+        animation: anim1 0.8s ease-in-out infinite;
+      }
+      @keyframes anim1 {
+        0% {
+          transform: translateY(0px);
         }
+        50% {
+          transform: translateY(2px);
+        }
+        100% {
+          transform: translateY(0px);
 
-            socket.onerror = (error) => {
-                console.log({ event: 'onerror', error })
+        }
+      }
+      #transcript:focus {
+        outline: none;
+        border: none;
+      }
+    </style>
+
+    <script>
+      navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+        if (!MediaRecorder.isTypeSupported("audio/webm"))
+          return alert("Browser not supported");
+
+        const mediaRecorder = new MediaRecorder(stream, {
+          mimeType: "audio/webm",
+        });
+
+        const socket = new WebSocket("ws://localhost:8000/listen");
+
+        socket.onopen = () => {
+          document.querySelector("#status").textContent = " Connected";
+          console.log({ event: "onopen" });
+          mediaRecorder.addEventListener("dataavailable", async (event) => {
+            if (event.data.size > 0 && socket.readyState == 1) {
+              socket.send(event.data);
             }
+          });
+          mediaRecorder.start(500);
+        };
 
-           })
-        </script>
-    </body>
+        socket.onmessage = (message) => {
+          const received = message.data;
+          if (received) {
+            console.log(received);
+            if (document.querySelector("#transcript").innerText === "Speak now")
+            {
+              document.querySelector("#transcript").textContent = "";
+              document.querySelector("#transcript").style.color = "#313131";
+            }
+            document.querySelector("#transcript").textContent += " " + received;
+          }
+        };
+
+        socket.onclose = () => {
+          console.log({ event: "onclose" });
+        };
+
+        socket.onerror = (error) => {
+          console.log({ event: "onerror", error });
+        };
+      });
+    </script>
+  </body>
 </html>
